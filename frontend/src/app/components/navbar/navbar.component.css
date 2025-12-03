@@ -1,0 +1,146 @@
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #fff;
+    padding: 15px 20px;
+    margin: 10px;
+    border-radius: 9px;
+    box-shadow: 0 0 10px #00c3ff76;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.Logo {
+    width: 90px;
+    height: 90px;  
+    margin-right: 50px;
+}
+
+.dropbtn {
+    background-color: #0099ff;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: solid 2px #0099ff;
+    cursor: pointer;
+    margin-bottom: auto;
+    margin-top: auto;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 150px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 162, 255, 0.589);
+    z-index: 1;
+    border-radius: 10px;
+}
+
+.dropdown-content a {
+    color: rgb(0, 0, 0);
+    padding: 11px 15px;
+    text-decoration: none;
+    display: block;
+    font-size: 13.5px;
+}
+
+.dropdown-content a:hover {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: solid 3px;
+    border-color: rgba(0, 162, 255, 0.589);
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #00c3ff;
+}
+
+.perfil {
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.perfil svg {
+    color: #000000;
+    width: 50px;
+    height: 50px;
+}
+
+.perfil:hover svg {
+    color: #333333;
+}
+
+.alinhamento-header {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.nav {
+    display: flex;
+    gap: 20px;
+}
+
+.titulo {
+    margin: 0;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+@media (max-width: 992px) {
+    .Logo {
+        width: 60px;
+        height: 60px;
+        margin-right: 20px;
+    }
+
+    .dropbtn {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .nav {
+        gap: 5px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 10px;
+    }
+
+    .alinhamento-header {
+        flex-wrap: wrap;
+    }
+
+    .nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .perfil {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}

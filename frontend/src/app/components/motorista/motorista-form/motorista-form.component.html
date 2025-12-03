@@ -1,0 +1,154 @@
+<div class="main-container">
+  <div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col-12">
+        <header>
+          <h3>
+            <i class="bi bi-person-badge"></i> 
+            {{ isEditMode ? 'Editar' : 'Novo' }} Motorista
+          </h3>
+        </header>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="card card-custom">
+          <div class="card-body">
+            <form [formGroup]="motoristaForm" (ngSubmit)="onSubmit()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nomeMoto" class="form-label">
+                    <i class="bi bi-person"></i> Nome Completo *
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="nomeMoto" 
+                    formControlName="nomeMoto"
+                    [class.is-invalid]="submitted && f['nomeMoto'].errors"
+                    placeholder="Digite o nome completo">
+                  <div class="invalid-feedback" *ngIf="submitted && f['nomeMoto'].errors">
+                    Nome é obrigatório
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="telefoneMoto" class="form-label">
+                    <i class="bi bi-telephone"></i> Telefone *
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="telefoneMoto" 
+                    formControlName="telefoneMoto"
+                    [class.is-invalid]="submitted && f['telefoneMoto'].errors"
+                    placeholder="(11) 98765-4321">
+                  <div class="invalid-feedback" *ngIf="submitted && f['telefoneMoto'].errors">
+                    Telefone é obrigatório
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="cpfMoto" class="form-label">
+                    <i class="bi bi-card-text"></i> CPF *
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="cpfMoto" 
+                    formControlName="cpfMoto"
+                    [class.is-invalid]="submitted && f['cpfMoto'].errors"
+                    placeholder="000.000.000-00">
+                  <div class="invalid-feedback" *ngIf="submitted && f['cpfMoto'].errors">
+                    CPF é obrigatório
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="cnhMoto" class="form-label">
+                    <i class="bi bi-card-heading"></i> CNH *
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="cnhMoto" 
+                    formControlName="cnhMoto"
+                    [class.is-invalid]="submitted && f['cnhMoto'].errors"
+                    placeholder="Digite o número da CNH">
+                  <div class="invalid-feedback" *ngIf="submitted && f['cnhMoto'].errors">
+                    CNH é obrigatória
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="datanascMoto" class="form-label">
+                    <i class="bi bi-calendar"></i> Data de Nascimento *
+                  </label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="datanascMoto" 
+                    formControlName="datanascMoto"
+                    [class.is-invalid]="submitted && f['datanascMoto'].errors">
+                  <div class="invalid-feedback" *ngIf="submitted && f['datanascMoto'].errors">
+                    Data de nascimento é obrigatória
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="buonnyMoto" class="form-label">
+                    <i class="bi bi-calendar-check"></i> Validade Buonny *
+                  </label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="buonnyMoto" 
+                    formControlName="buonnyMoto"
+                    [class.is-invalid]="submitted && f['buonnyMoto'].errors">
+                  <div class="invalid-feedback" *ngIf="submitted && f['buonnyMoto'].errors">
+                    Data do exame é obrigatória
+                  </div>
+                </div>
+
+                <div class="col-12 mb-3">
+                  <label for="enderecoMoto" class="form-label">
+                    <i class="bi bi-geo-alt"></i> Endereço Completo *
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="enderecoMoto" 
+                    formControlName="enderecoMoto"
+                    [class.is-invalid]="submitted && f['enderecoMoto'].errors"
+                    placeholder="Rua, número, bairro, cidade - UF">
+                  <div class="invalid-feedback" *ngIf="submitted && f['enderecoMoto'].errors">
+                    Endereço é obrigatório
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button 
+                  type="button" 
+                  class="btn btn-secondary" 
+                  (click)="voltar()"
+                  [disabled]="loading">
+                  <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+                <button 
+                  type="submit" 
+                  class="btn btn-primary" 
+                  [disabled]="loading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i class="bi bi-check-circle" *ngIf="!loading"></i>
+                  {{ loading ? 'Salvando...' : 'Salvar' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

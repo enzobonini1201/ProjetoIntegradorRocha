@@ -1,0 +1,106 @@
+<div class="login-container">
+    <!-- Lado esquerdo - Logo e degradê -->
+    <div class="left-side">
+        <div class="logo-container-left">
+            <img src="assets/Logo rocha.png" alt="Logo Rocha" class="logo-rocha-left">
+        </div>
+        <div class="welcome-text">
+            <h1>Recuperação de Senha</h1>
+            <p>Digite seu CPF e crie uma nova senha</p>
+        </div>
+    </div>
+
+    <!-- Lado direito - Formulário -->
+    <div class="right-side">
+        <div class="form-container">
+            <h2 class="form-title">Recuperar Acesso</h2>
+            <p class="form-subtitle">Informe o CPF e a nova senha</p>
+
+            <div class="alert alert-success" *ngIf="mensagemSucesso" style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                <i class="bi bi-check-circle-fill"></i>
+                {{ mensagemSucesso }}
+            </div>
+
+            <div class="alert alert-danger" *ngIf="mensagemErro" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                {{ mensagemErro }}
+            </div>
+
+            <form [formGroup]="recuperarForm" (ngSubmit)="onSubmit()" novalidate>
+                <div class="input-group-modern">
+                    <label for="cpf" class="form-label-modern">CPF</label>
+                    <div class="input-group" style="position: relative;">
+                        <span class="input-group-text">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="cpf" 
+                            formControlName="cpf"
+                            (input)="formatarCPF($event)"
+                            [class.is-invalid]="submitted && f['cpf'].errors"
+                            placeholder="000.000.000-00" 
+                            maxlength="14">
+                    </div>
+                    <div class="invalid-feedback" *ngIf="submitted && f['cpf'].errors">
+                        CPF é obrigatório e deve estar no formato correto
+                    </div>
+                </div>
+
+                <div class="input-group-modern">
+                    <label for="novaSenha" class="form-label-modern">Nova Senha</label>
+                    <div class="input-group" style="position: relative;">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="novaSenha" 
+                            formControlName="novaSenha"
+                            [class.is-invalid]="submitted && f['novaSenha'].errors"
+                            placeholder="Mín. 8 caracteres, 1 maiúscula, 1 número, 1 especial">
+                    </div>
+                    <div class="invalid-feedback" *ngIf="submitted && f['novaSenha'].errors">
+                        <span *ngIf="f['novaSenha'].errors['required']">Nova senha é obrigatória</span>
+                        <span *ngIf="f['novaSenha'].errors['minlength']">Mínimo 8 caracteres</span>
+                    </div>
+                </div>
+
+                <div class="input-group-modern">
+                    <label for="confirmarSenha" class="form-label-modern">Confirmar Nova Senha</label>
+                    <div class="input-group" style="position: relative;">
+                        <span class="input-group-text">
+                            <i class="bi bi-shield-check"></i>
+                        </span>
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="confirmarSenha" 
+                            formControlName="confirmarSenha"
+                            [class.is-invalid]="submitted && f['confirmarSenha'].errors"
+                            placeholder="Confirme a nova senha">
+                    </div>
+                    <div class="invalid-feedback" *ngIf="submitted && f['confirmarSenha'].errors">
+                        Confirmação de senha é obrigatória
+                    </div>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="btn-login" 
+                    [disabled]="loading">
+                    <i class="bi" [ngClass]="loading ? 'bi-hourglass-split' : 'bi-key-fill'"></i>
+                    {{ loading ? 'PROCESSANDO...' : 'RECUPERAR SENHA' }}
+                </button>
+
+                <div class="text-center mt-4">
+                    <a routerLink="/login" class="link-secondary">
+                        <i class="bi bi-arrow-left-circle"></i> Voltar para o login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

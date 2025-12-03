@@ -1,0 +1,164 @@
+<div class="login-container">
+    <!-- Lado Esquerdo - Logo e Marca -->
+    <div class="left-side">
+        <div class="logo-container">
+            <img src="assets/Logo rocha.png" alt="Logo Rocha" class="logo-rocha">
+        </div>
+        <div class="welcome-text">
+            <h2>Crie sua conta!</h2>
+            <p>Cadastre-se no Sistema Rocha Transportes</p>
+        </div>
+    </div>
+
+    <!-- Lado Direito - Formulário -->
+    <div class="right-side">
+        <div class="form-container">
+            <div class="form-header">
+                <h1 class="form-title">Cadastro</h1>
+                <p class="form-subtitle">Preencha seus dados para criar sua conta</p>
+            </div>
+
+            <div class="alert alert-danger" *ngIf="error" [class.shake]="error">
+                <i class="bi bi-exclamation-triangle"></i> {{ error }}
+            </div>
+
+            <form [formGroup]="cadastroForm" (ngSubmit)="onSubmit()" novalidate>
+                <div class="input-group-modern">
+                    <label for="nomeCompleto" class="form-label-modern">Nome Completo</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nomeCompleto" 
+                            formControlName="nomeCompleto"
+                            [class.is-invalid]="submitted && f['nomeCompleto'].errors"
+                            placeholder="Digite seu nome completo">
+                    </div>
+                    <div class="invalid-feedback" *ngIf="submitted && f['nomeCompleto'].errors">
+                        <span *ngIf="f['nomeCompleto'].errors['required']">Informe seu nome completo</span>
+                        <span *ngIf="f['nomeCompleto'].errors['minlength']">Nome deve ter pelo menos 3 caracteres</span>
+                    </div>
+                </div>
+
+                <div class="input-group-modern">
+                    <label for="cpf" class="form-label-modern">CPF</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-card-text"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="cpf" 
+                            formControlName="cpf"
+                            (input)="formatarCPF($event)"
+                            [class.is-invalid]="submitted && f['cpf'].errors"
+                            placeholder="000.000.000-00" 
+                            maxlength="14">
+                    </div>
+                    <div class="invalid-feedback" *ngIf="submitted && f['cpf'].errors">
+                        Informe um CPF válido
+                    </div>
+                </div>
+
+                <div class="input-group-modern">
+                    <label for="senha" class="form-label-modern">Senha</label>
+                    <div class="input-group" style="position: relative;">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input 
+                            [type]="showPassword ? 'text' : 'password'"
+                            class="form-control" 
+                            id="senha" 
+                            formControlName="senha"
+                            (input)="verificarForcaSenha()"
+                            [class.is-invalid]="submitted && f['senha'].errors"
+                            placeholder="Digite sua senha"
+                            style="padding-right: 45px;">
+                        <button type="button" class="password-toggle-modern" (click)="togglePassword()">
+                            <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Indicadores de força da senha -->
+                    <div class="password-strength-indicators" *ngIf="f['senha'].value">
+                        <div class="strength-item" [class.valid]="senhaRequisitos.minimo8">
+                            <i class="bi" [ngClass]="senhaRequisitos.minimo8 ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                            <span>Mínimo 8 caracteres</span>
+                        </div>
+                        <div class="strength-item" [class.valid]="senhaRequisitos.maiuscula">
+                            <i class="bi" [ngClass]="senhaRequisitos.maiuscula ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                            <span>Pelo menos uma letra maiúscula</span>
+                        </div>
+                        <div class="strength-item" [class.valid]="senhaRequisitos.minuscula">
+                            <i class="bi" [ngClass]="senhaRequisitos.minuscula ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                            <span>Pelo menos uma letra minúscula</span>
+                        </div>
+                        <div class="strength-item" [class.valid]="senhaRequisitos.numero">
+                            <i class="bi" [ngClass]="senhaRequisitos.numero ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                            <span>Pelo menos um número</span>
+                        </div>
+                        <div class="strength-item" [class.valid]="senhaRequisitos.especial">
+                            <i class="bi" [ngClass]="senhaRequisitos.especial ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                            <span>Pelo menos um caractere especial (!&#64;#$%)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="invalid-feedback" *ngIf="submitted && f['senha'].errors">
+                        Senha deve atender a todos os requisitos acima
+                    </div>
+                </div>
+
+                <div class="input-group-modern">
+                    <label for="confirmarSenha" class="form-label-modern">Confirmar Senha</label>
+                    <div class="input-group" style="position: relative;">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill"></i>
+                        </span>
+                        <input 
+                            [type]="showConfirmPassword ? 'text' : 'password'"
+                            class="form-control" 
+                            id="confirmarSenha" 
+                            formControlName="confirmarSenha"
+                            [class.is-invalid]="submitted && f['confirmarSenha'].errors"
+                            placeholder="Confirme sua senha"
+                            style="padding-right: 45px;">
+                        <button type="button" class="password-toggle-modern" (click)="toggleConfirmPassword()">
+                            <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback" *ngIf="submitted && f['confirmarSenha'].errors">
+                        Confirme sua senha
+                    </div>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="btn btn-login" 
+                    [disabled]="loading">
+                    <span *ngIf="!loading">
+                        <i class="bi bi-person-plus-fill"></i> Cadastrar
+                    </span>
+                    <span *ngIf="loading">
+                        <i class="bi bi-check-circle-fill"></i> Cadastrando...
+                    </span>
+                </button>
+
+                <div class="divider">
+                    <span>ou</span>
+                </div>
+
+                <div class="text-center-modern">
+                    Já tem conta? 
+                    <a routerLink="/login" class="link-modern">
+                        <i class="bi bi-box-arrow-in-right"></i> Faça login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

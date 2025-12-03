@@ -1,0 +1,268 @@
+/* Estilos Globais - Sistema Rocha Transportes */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: transparent;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Cores do sistema - baseado no sistema antigo */
+:root {
+  --cor-principal: #007bff;
+  --cor-secundaria: #6c757d;
+  --cor-sucesso: #28a745;
+  --cor-perigo: #dc3545;
+  --cor-aviso: #ffc107;
+  --cor-info: #17a2b8;
+  --cor-azul: #0066cc;
+  --cor-azul-escuro: #004080;
+}
+
+.azul {
+  background-color: var(--cor-azul) !important;
+  color: white !important;
+}
+
+.cor {
+  background-color: var(--cor-principal);
+  color: white;
+  border: none;
+}
+
+.cor:hover {
+  background-color: var(--cor-azul-escuro);
+}
+
+/* Container principal */
+.main-container {
+  min-height: 100vh;
+  padding-top: 70px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Card customizado */
+.card-custom {
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+/* Tabela customizada */
+.tabela {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  border-bottom: 2px solid var(--cor-azul);
+  font-weight: 600;
+}
+
+/* Botões */
+.btn-primary {
+  background-color: var(--cor-principal);
+  border-color: var(--cor-principal);
+}
+
+.btn-primary:hover {
+  background-color: var(--cor-azul-escuro);
+  border-color: var(--cor-azul-escuro);
+}
+
+.pesquisa {
+  background-color: var(--cor-principal);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 0 4px 4px 0;
+}
+
+.pesquisa:hover {
+  background-color: var(--cor-azul-escuro);
+}
+
+/* Formulários */
+.form-control:focus {
+  border-color: var(--cor-azul);
+  box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+}
+
+.form-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+label {
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h3 {
+  font-weight: bold;
+}
+
+.cadastrar {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Navbar customizada */
+.navbar-custom {
+  background-color: var(--cor-azul);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: white !important;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #e0e0e0 !important;
+}
+
+/* Headers */
+header h3 {
+  color: var(--cor-azul);
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--cor-azul);
+  font-size: 1.25rem;
+}
+
+header h3 i {
+  font-size: 1.1rem;
+  margin-right: 6px;
+}
+
+/* Cards de login */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cor-azul) 0%, var(--cor-azul-escuro) 100%);
+}
+
+.login-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  max-width: 450px;
+  width: 100%;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h2 {
+  color: var(--cor-azul);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.login-header p {
+  color: #6c757d;
+}
+
+/* Alertas customizados */
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+/* Loading spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .main-container {
+    padding-top: 60px;
+  }
+
+  .tabela {
+    overflow-x: auto;
+  }
+
+  .table {
+    font-size: 0.9rem;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Utilitários */
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.borda {
+  background-color: #fff;
+  padding: 50px; 
+  border-radius: 8px; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); 
+  margin-bottom: 20px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+  border-radius: 10px;
+  padding: 25px;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card i {
+  font-size: 3rem;
+  opacity: 0.8;
+}

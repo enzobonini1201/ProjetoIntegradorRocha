@@ -1,0 +1,383 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.login-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.left-side {
+    flex: 1;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.left-side::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 136, 221, 0.05) 0%, transparent 70%);
+    animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.logo-container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    animation: fadeInUp 0.8s ease;
+}
+
+.logo-rocha {
+    width: 280px;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(0, 136, 221, 0.2));
+    transition: all 0.3s ease;
+}
+
+.logo-rocha:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 15px 40px rgba(0, 136, 221, 0.3));
+}
+
+.welcome-text {
+    position: relative;
+    z-index: 2;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.welcome-text h2 {
+    color: #0088dd;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.welcome-text p {
+    color: #546e7a;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.right-side {
+    flex: 1;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 420px;
+    animation: fadeIn 0.8s ease;
+}
+
+.form-header {
+    margin-bottom: 30px;
+}
+
+.form-title {
+    color: #1e293b;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.form-subtitle {
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.form-label-modern {
+    color: #334155;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-group-modern {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group-modern .input-group {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+.input-group-modern .input-group-text {
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    border-right: none;
+    color: #0088dd;
+    padding: 12px 15px;
+    border-radius: 12px 0 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group-modern .form-control {
+    border: 2px solid #e2e8f0;
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 15px;
+    font-size: 15px;
+    background: #ffffff;
+    color: #1e293b;
+    transition: all 0.3s ease;
+    caret-color: #0088dd;
+    flex: 1;
+    height: auto;
+}
+
+.input-group-modern .form-control::placeholder {
+    color: #94a3b8;
+}
+
+.input-group-modern .form-control:hover {
+    border-color: #cbd5e1;
+}
+
+.input-group-modern .form-control:focus {
+    border-color: #0088dd;
+    box-shadow: 0 0 0 3px rgba(0, 136, 221, 0.1);
+    outline: none;
+}
+
+.input-group-modern .form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+.btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, #0088dd 0%, #0099ee 100%);
+    border: none;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(0, 136, 221, 0.3);
+}
+
+.btn-login:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0099ee 0%, #00aaff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 136, 221, 0.4);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.password-toggle-modern {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+    z-index: 10;
+}
+
+.password-toggle-modern:hover {
+    color: #0088dd;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 25px 0 20px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.divider span {
+    padding: 0 15px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.link-modern {
+    color: #0088dd;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.link-modern:hover {
+    color: #0066bb;
+    text-decoration: underline;
+}
+
+.text-center-modern {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.alert {
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+.invalid-feedback {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .left-side {
+        min-height: 30vh;
+        padding: 20px;
+    }
+
+    .logo-rocha {
+        width: 150px;
+    }
+
+    .welcome-text h2 {
+        font-size: 24px;
+    }
+
+    .welcome-text p {
+        font-size: 14px;
+    }
+
+    .right-side {
+        min-height: 70vh;
+        padding: 30px 20px;
+    }
+
+    .form-container {
+        max-width: 100%;
+    }
+
+    .form-title {
+        font-size: 26px;
+    }
+}
+
+/* Indicadores de força da senha */
+.password-strength-indicators {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.strength-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    color: #dc3545;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.strength-item.valid {
+    color: #28a745;
+}
+
+.strength-item i {
+    font-size: 1rem;
+}
+
+.strength-item.valid i {
+    color: #28a745;
+}
+
+.strength-item:not(.valid) i {
+    color: #dc3545;
+}
+
+.strength-item span {
+    font-weight: 500;
+}

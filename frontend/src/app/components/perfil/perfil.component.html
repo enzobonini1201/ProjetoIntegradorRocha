@@ -1,0 +1,150 @@
+<div class="container mt-4">
+  <header class="mb-4">
+    <h3><i class="bi bi-person-circle"></i> Meu Perfil</h3>
+  </header>
+
+  <!-- Mensagens de sucesso/erro globais -->
+  <div *ngIf="mensagemSucesso" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ mensagemSucesso }}
+    <button type="button" class="btn-close" (click)="mensagemSucesso = ''"></button>
+  </div>
+
+  <div *ngIf="mensagemErro" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ mensagemErro }}
+    <button type="button" class="btn-close" (click)="mensagemErro = ''"></button>
+  </div>
+
+  <div class="row">
+    <!-- Card de Informações do Perfil -->
+    <div class="col-lg-6 mb-4">
+      <div class="card card-custom">
+        <div class="card-body">
+          <h5 class="card-title mb-4">
+            <i class="bi bi-person-badge me-2"></i>Informações do Perfil
+          </h5>
+
+          <div *ngIf="loadingPerfil" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!loadingPerfil">
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="bi bi-person-fill me-2"></i>Nome
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [value]="usuario.nome" 
+                disabled
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="bi bi-at me-2"></i>Login
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [value]="usuario.login" 
+                disabled
+              >
+            </div>
+
+            <div class="alert alert-info" role="alert">
+              <i class="bi bi-info-circle me-2"></i>
+              Para alterar suas informações pessoais, entre em contato com o administrador do sistema.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Alteração de Senha -->
+    <div class="col-lg-6 mb-4">
+      <div class="card card-custom">
+        <div class="card-body">
+          <h5 class="card-title mb-4">
+            <i class="bi bi-key me-2"></i>Alterar Senha
+          </h5>
+
+          <div *ngIf="mensagemErroSenha" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ mensagemErroSenha }}
+          </div>
+
+          <form #senhaForm="ngForm" (ngSubmit)="alterarSenha()">
+            <div class="mb-3">
+              <label for="senhaAtual" class="form-label">
+                <i class="bi bi-lock me-2"></i>Senha Atual
+              </label>
+              <input
+                type="password"
+                class="form-control"
+                id="senhaAtual"
+                name="senhaAtual"
+                [(ngModel)]="senhaAtual"
+                required
+                placeholder="Digite sua senha atual"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="novaSenha" class="form-label">
+                <i class="bi bi-lock-fill me-2"></i>Nova Senha
+              </label>
+              <input
+                type="password"
+                class="form-control"
+                id="novaSenha"
+                name="novaSenha"
+                [(ngModel)]="novaSenha"
+                required
+                minlength="8"
+                placeholder="Mín. 8 caracteres, 1 maiúscula, 1 número, 1 especial (@#$%^&+=!)"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="confirmarSenha" class="form-label">
+                <i class="bi bi-check2-circle me-2"></i>Confirmar Nova Senha
+              </label>
+              <input
+                type="password"
+                class="form-control"
+                id="confirmarSenha"
+                name="confirmarSenha"
+                [(ngModel)]="confirmarSenha"
+                required
+                placeholder="Confirme a nova senha"
+              >
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="loading || !senhaForm.valid"
+              >
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!loading" class="bi bi-shield-check me-2"></i>
+                {{ loading ? 'Alterando...' : 'Alterar Senha' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão Voltar -->
+  <div class="row">
+    <div class="col-12">
+      <button class="btn btn-secondary" routerLink="/home">
+        <i class="bi bi-arrow-left me-2"></i>Voltar
+      </button>
+    </div>
+  </div>
+</div>
