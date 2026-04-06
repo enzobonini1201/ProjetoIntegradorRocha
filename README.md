@@ -1,191 +1,245 @@
-# Sistema Rocha Transportes - Instruções de Setup
+# Sistema Rocha Transportes
 
-## Backend (Java Spring Boot)
+Guia completo para executar o projeto **backend + frontend** em ambiente local Windows.
 
-### Pré-requisitos
-- Java 17 ou superior
-- PostgreSQL 12 ou superior
-- Maven 3.6 ou superior
+## 1) Tecnologias usadas
 
-### Configuração do Banco de Dados
+- **Backend:** Java 17+, Spring Boot 3.1.4, Spring Security (JWT), Spring Data JPA, PostgreSQL
+- **Frontend:** Angular 17, TypeScript, RxJS, Bootstrap 5, Bootstrap Icons
+- **Build tools:** Maven e npm
 
-1. Instale o PostgreSQL se ainda não tiver
-2. Crie o banco de dados:
+## 2) Pré-requisitos obrigatórios
+
+Instale antes de executar:
+
+1. **PostgreSQL** (recomendado 12+)
+2. **JDK** 17+ (o projeto compila com `java.version=17`)
+3. **Node.js** 18+ (com npm)
+
+> Observação: o script `backend/start-backend.ps1` tenta usar o Java em:
+>
+> `C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot`
+>
+> Se seu Java estiver em outro caminho, altere a variável `$javaPath` dentro desse script.
+
+## 3) Configuração do banco de dados
+
+O backend usa por padrão (`backend/src/main/resources/application.properties`):
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/db_rocha
+spring.datasource.username=postgres
+spring.datasource.password=root
+```
+
+### 3.1 Criar banco
+
 ```sql
 CREATE DATABASE db_rocha;
 ```
 
-3. Execute o script SQL fornecido:
-```bash
-psql -U postgres -d db_rocha -f backend/db_rocha_postgres.sql
+### 3.2 Ajustar credenciais
+
+Se seu usuário/senha do PostgreSQL forem diferentes, edite o arquivo:
+
+`backend/src/main/resources/application.properties`
+
+e ajuste `spring.datasource.username` e `spring.datasource.password`.
+
+### 3.3 Sobre script SQL inicial
+
+Existe o arquivo `backend/db_rocha_postgres.sql`, porém o projeto já está com
+`spring.jpa.hibernate.ddl-auto=update`, então o Hibernate cria/atualiza schema automaticamente.
+
+**Fluxo recomendado para rodar sem conflito:**
+- criar apenas o banco vazio `db_rocha`
+- iniciar o backend (Hibernate cria/ajusta tabelas)
+
+## 4) Como rodar o backend
+
+No PowerShell, na pasta `backend`:
+
+```powershell
+cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\backend"
+.\start-backend.ps1
 ```
 
-4. Configure as credenciais em `backend/src/main/resources/application.properties`:
-```properties
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
+Se preferir sem script:
+
+```powershell
+cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\backend"
+.\mvnw.cmd spring-boot:run
 ```
 
-### Executando o Backend
+Backend disponível em:
 
-```bash
-cd backend
-./mvnw spring-boot:run
-```
+- `http://localhost:8080`
 
-Ou no Windows:
-```bash
-cd backend
-mvnw.cmd spring-boot:run
-```
+## 5) Como rodar o frontend
 
-O backend estará disponível em: http://localhost:8080
+No PowerShell, na pasta `frontend`:
 
-### Usuário Padrão
-- Login: `admin`
-- Senha: `123456`
-
-## Frontend (Angular)
-
-### Pré-requisitos
-- Node.js 18 ou superior
-- Angular CLI 17 ou superior
-
-### Instalação
-
-```bash
-cd frontend
+```powershell
+cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\frontend"
 npm install
+npm start
 ```
 
-### Executando o Frontend
+Frontend disponível em:
 
-```bash
-cd frontend
-ng serve
+- `http://localhost:4200`
+
+## 6) Primeira execução (login/cadastro)
+
+### 6.1 Não dependa de usuário fixo
+
+Apesar de existir inserção de `admin` no SQL legado, o fluxo atual do sistema usa cadastro moderno por CPF e senha BCrypt.
+
+### 6.2 Faça o cadastro pela tela
+
+1. Abra `http://localhost:4200`
+2. Vá em **Cadastro**
+3. Informe nome, CPF e senha
+
+Regras de senha (backend valida):
+- mínimo 8 caracteres
+- pelo menos 1 maiúscula
+- pelo menos 1 minúscula
+- pelo menos 1 número
+- pelo menos 1 especial: `@#$%^&+=!`
+
+### 6.3 Faça login
+
+- Login: **CPF** (com ou sem máscara)
+- Senha: a cadastrada
+
+## 7) Endpoints principais
+
+### Autenticação e usuário
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `GET /api/auth/me` (autenticado)
+- `PUT /api/auth/me` (autenticado)
+- `PUT /api/auth/senha` (autenticado)
+- `POST /api/usuarios/cadastro` (público)
+- `POST /api/usuarios/recuperar-senha` (público)
+
+### CRUDs protegidos por JWT
+- `GET|POST /api/motoristas`
+- `GET|PUT|DELETE /api/motoristas/{id}`
+- `GET|POST /api/agregados`
+- `GET|PUT|DELETE /api/agregados/{id}`
+- `GET|POST /api/ajudantes`
+- `GET|PUT|DELETE /api/ajudantes/{id}`
+- `GET|POST /api/clientes`
+- `GET|PUT|DELETE /api/clientes/{id}`
+- `GET|POST /api/transportes`
+- `GET|PUT|DELETE /api/transportes/{id}`
+- `GET|POST /api/notas`
+- `GET|PUT|DELETE /api/notas/{id}`
+- `GET|POST /api/rotas`
+- `GET|PUT|DELETE /api/rotas/{id}`
+
+## 8) Ordem exata para subir tudo
+
+1. Subir PostgreSQL
+2. Criar DB `db_rocha`
+3. Ajustar `application.properties` (se necessário)
+4. Iniciar backend (`start-backend.ps1` ou `mvnw.cmd spring-boot:run`)
+5. Iniciar frontend (`npm install` + `npm start`)
+6. Acessar `http://localhost:4200`
+7. Cadastrar usuário e logar com CPF
+
+## 9) Problemas comuns
+
+### Erro de conexão com banco
+- confira se PostgreSQL está ativo
+- confirme URL/usuário/senha em `application.properties`
+
+### Porta 8080 ocupada
+- altere em `backend/src/main/resources/application.properties`:
+	- `server.port=8081`
+- ajuste também o frontend (`frontend/src/environments/environment.ts`):
+	- `apiUrl: 'http://localhost:8081/api'`
+
+### Porta 4200 ocupada
+
+```powershell
+cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\frontend"
+npx ng serve --port 4201
 ```
 
-O frontend estará disponível em: http://localhost:4200
+Se mudar a porta do frontend, ajuste CORS no backend (`cors.allowed.origins`).
 
-## APIs Disponíveis
+## 10) Estrutura resumida
 
-### Autenticação
-- POST `/api/auth/login` - Login
-- POST `/api/auth/register` - Registro
-- GET `/api/auth/me` - Dados do usuário logado
-- PUT `/api/auth/me` - Atualizar perfil
-
-### Motoristas
-- GET `/api/motoristas` - Listar todos
-- GET `/api/motoristas/{id}` - Buscar por ID
-- POST `/api/motoristas` - Criar novo
-- PUT `/api/motoristas/{id}` - Atualizar
-- DELETE `/api/motoristas/{id}` - Deletar
-
-### Agregados
-- GET `/api/agregados` - Listar todos
-- GET `/api/agregados/{id}` - Buscar por ID
-- POST `/api/agregados` - Criar novo
-- PUT `/api/agregados/{id}` - Atualizar
-- DELETE `/api/agregados/{id}` - Deletar
-
-### Ajudantes
-- GET `/api/ajudantes` - Listar todos
-- GET `/api/ajudantes/{id}` - Buscar por ID
-- POST `/api/ajudantes` - Criar novo
-- PUT `/api/ajudantes/{id}` - Atualizar
-- DELETE `/api/ajudantes/{id}` - Deletar
-
-### Clientes
-- GET `/api/clientes` - Listar todos
-- GET `/api/clientes/{id}` - Buscar por ID
-- POST `/api/clientes` - Criar novo
-- PUT `/api/clientes/{id}` - Atualizar
-- DELETE `/api/clientes/{id}` - Deletar
-
-### Transportes
-- GET `/api/transportes` - Listar todos
-- GET `/api/transportes/{id}` - Buscar por ID
-- POST `/api/transportes` - Criar novo
-- PUT `/api/transportes/{id}` - Atualizar
-- DELETE `/api/transportes/{id}` - Deletar
-
-### Notas Fiscais
-- GET `/api/notas` - Listar todas
-- GET `/api/notas/{id}` - Buscar por ID
-- POST `/api/notas` - Criar nova
-- PUT `/api/notas/{id}` - Atualizar
-- DELETE `/api/notas/{id}` - Deletar
-
-### Rotas
-- GET `/api/rotas` - Listar todas
-- GET `/api/rotas/{id}` - Buscar por ID
-- POST `/api/rotas` - Criar nova
-- PUT `/api/rotas/{id}` - Atualizar
-- DELETE `/api/rotas/{id}` - Deletar
-
-## Estrutura do Projeto
-
-```
+```text
 SistemaRocha/
-├── backend/                    # Backend Spring Boot
-│   ├── src/
-│   │   └── main/
-│   │       ├── java/
-│   │       │   └── com/rochatransportes/
-│   │       │       ├── config/         # Configurações
-│   │       │       ├── controller/     # Controllers REST
-│   │       │       ├── dto/            # Data Transfer Objects
-│   │       │       ├── model/          # Entidades JPA
-│   │       │       ├── repository/     # Repositories
-│   │       │       ├── security/       # Segurança e JWT
-│   │       │       └── service/        # Serviços
-│   │       └── resources/
-│   │           └── application.properties
+├── backend/
+│   ├── src/main/java/com/rochatransportes/
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── repository/
+│   │   ├── model/
+│   │   ├── dto/
+│   │   └── security/
+│   ├── src/main/resources/application.properties
 │   ├── pom.xml
-│   └── db_rocha_postgres.sql   # Script do banco
-├── frontend/                   # Frontend Angular
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── components/     # Componentes
-│   │   │   ├── services/       # Serviços
-│   │   │   ├── guards/         # Guards de autenticação
-│   │   │   ├── interceptors/   # Interceptadores HTTP
-│   │   │   └── models/         # Interfaces/Models
-│   │   ├── assets/             # Recursos estáticos
-│   │   └── styles.css          # Estilos globais
-│   ├── angular.json
-│   └── package.json
-└── dbrocha/                    # Sistema PHP antigo (referência)
+│   └── start-backend.ps1
+└── frontend/
+		├── src/app/components/
+		├── src/app/services/
+		├── src/app/guards/
+		├── src/app/interceptors/
+		├── src/environments/
+		└── package.json
 ```
 
-## Tecnologias Utilizadas
+## 11) Execução rápida (2 terminais)
 
-### Backend
-- Java 17
-- Spring Boot 3.1.4
-- Spring Security + JWT
-- Spring Data JPA
-- PostgreSQL
-- Maven
+Use este fluxo quando já tiver PostgreSQL rodando e o banco `db_rocha` criado.
 
-### Frontend
-- Angular 17
-- TypeScript
-- Bootstrap 5
-- RxJS
-- Angular Material (opcional)
+### Terminal 1 (backend)
 
-## Segurança
-- Autenticação via JWT (JSON Web Token)
-- Senhas criptografadas com BCrypt
-- CORS configurado para localhost:4200
-- Proteção de rotas no frontend com Guards
-- Validação de dados no backend com Bean Validation
+```powershell
+cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\backend"
+.\start-backend.ps1
+```
 
-## Próximos Passos
-1. Execute o script SQL no PostgreSQL
-2. Inicie o backend
-3. Instale as dependências do frontend
-4. Inicie o frontend
-5. Acesse http://localhost:4200 e faça login com admin/123456
+### Terminal 2 (frontend)
+
+```powershell
+cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\frontend"
+npm install
+npm start
+```
+
+### Acesso
+
+- Frontend: `http://localhost:4200`
+- Backend: `http://localhost:8080`
+
+## 12) Checklist de validação (healthcheck)
+
+Após subir os serviços, valide nesta ordem:
+
+1. **Banco conectado**
+	- no terminal do backend, confirme que não houve erro de conexão PostgreSQL.
+
+2. **API no ar**
+	- abra `http://localhost:8080` (deve responder, mesmo que com erro de rota padrão).
+
+3. **Frontend no ar**
+	- abra `http://localhost:4200` e confirme tela de login.
+
+4. **Cadastro funcionando**
+	- faça um cadastro em `/cadastro` com senha forte.
+
+5. **Login funcionando**
+	- autentique com CPF e senha cadastrados.
+
+6. **JWT funcionando**
+	- navegue para `/home`; se abrir sem redirecionar para login, autenticação está OK.
+
+7. **CRUD protegido funcionando**
+	- teste uma listagem (ex.: `/motoristas`) e confirme retorno sem erro 401/403.
