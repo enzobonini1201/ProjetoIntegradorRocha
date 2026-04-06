@@ -1,5 +1,19 @@
 package com.rochatransportes.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.rochatransportes.dto.AlterarSenhaRequest;
 import com.rochatransportes.dto.AuthResponse;
 import com.rochatransportes.dto.LoginRequest;
@@ -7,14 +21,8 @@ import com.rochatransportes.dto.RegisterRequest;
 import com.rochatransportes.dto.UpdateUserRequest;
 import com.rochatransportes.model.Usuario;
 import com.rochatransportes.service.AuthService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")

@@ -1,10 +1,11 @@
 package com.rochatransportes.repository;
 
-import com.rochatransportes.model.Rota;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.rochatransportes.model.Rota;
 
 @Repository
 public interface RotaRepository extends JpaRepository<Rota, Long> {
