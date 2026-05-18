@@ -28,7 +28,7 @@ import { Rota } from '../../../models/rota.model';
             <button class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados">
               <i class="bi bi-funnel"></i> Filtros
             </button>
-            <button class="btn btn-primary" (click)="router.navigate(['/rotas/novo'])"><i class="bi bi-plus-circle"></i> Nova Nota</button>
+            <button class="btn btn-primary" (click)="router.navigate(['/rotas/novo'])"><i class="bi bi-plus-circle"></i> Nova Rota</button>
           </div>
         </div>
 
@@ -90,6 +90,22 @@ import { Rota } from '../../../models/rota.model';
                   <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.tipo" id="colTipo">
                   <label class="form-check-label small" for="colTipo">Tipo</label>
                 </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.nota" id="colNota">
+                    <label class="form-check-label small" for="colNota">Nota</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.cliente" id="colCliente">
+                    <label class="form-check-label small" for="colCliente">Cliente</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.veiculo" id="colVeiculo">
+                    <label class="form-check-label small" for="colVeiculo">Veículo</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.ajudantes" id="colAjudantes">
+                    <label class="form-check-label small" for="colAjudantes">Ajudantes</label>
+                  </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.acoes" id="colAcoes">
                   <label class="form-check-label small" for="colAcoes">Ações</label>
@@ -110,6 +126,10 @@ import { Rota } from '../../../models/rota.model';
                 <th class="azul" *ngIf="colunas.destino">Destino</th>
                 <th class="azul" *ngIf="colunas.responsavel">Responsável</th>
                 <th class="azul" *ngIf="colunas.tipo">Tipo</th>
+                <th class="azul" *ngIf="colunas.nota">Nota</th>
+                <th class="azul" *ngIf="colunas.cliente">Cliente</th>
+                <th class="azul" *ngIf="colunas.veiculo">Veículo</th>
+                <th class="azul" *ngIf="colunas.ajudantes">Ajudantes</th>
                 <th class="azul text-center" *ngIf="colunas.acoes">Ações</th>
               </tr>
             </thead>
@@ -128,6 +148,10 @@ import { Rota } from '../../../models/rota.model';
                   </span>
                   <span *ngIf="!item.tipoResponsavel">-</span>
                 </td>
+                <td *ngIf="colunas.nota">{{ item.numeroNota || '-' }}</td>
+                <td *ngIf="colunas.cliente">{{ item.nomeCliente || item.clienteNota || '-' }}</td>
+                <td *ngIf="colunas.veiculo">{{ item.nomeVeiculo || item.placaVeiculo || '-' }}</td>
+                <td *ngIf="colunas.ajudantes">{{ ajudantesTexto(item) }}</td>
                 <td class="text-center" *ngIf="colunas.acoes">
                   <button class="btn btn-sm btn-info me-1" 
                           (click)="item.coordenadasOrigem && item.coordenadasDestino ? visualizarMapa(item) : alertaSemMapa(item)" 
@@ -249,6 +273,10 @@ export class RotaListComponent implements OnInit {
     destino: true,
     responsavel: true,
     tipo: true,
+    nota: true,
+    cliente: true,
+    veiculo: true,
+    ajudantes: true,
     acoes: true
   };
   
@@ -300,7 +328,11 @@ export class RotaListComponent implements OnInit {
       const matchPesquisa = !this.pesquisa || 
         r.origem.toLowerCase().includes(this.pesquisa.toLowerCase()) ||
         r.destino.toLowerCase().includes(this.pesquisa.toLowerCase()) ||
-        (r.nomeResponsavel && r.nomeResponsavel.toLowerCase().includes(this.pesquisa.toLowerCase()));
+        (r.nomeResponsavel && r.nomeResponsavel.toLowerCase().includes(this.pesquisa.toLowerCase())) ||
+        (r.numeroNota?.toString().includes(this.pesquisa.toLowerCase())) ||
+        (r.clienteNota && r.clienteNota.toLowerCase().includes(this.pesquisa.toLowerCase())) ||
+        (r.nomeCliente && r.nomeCliente.toLowerCase().includes(this.pesquisa.toLowerCase())) ||
+        (r.nomeVeiculo && r.nomeVeiculo.toLowerCase().includes(this.pesquisa.toLowerCase()));
       
       return matchOrigem && matchDestino && matchResponsavel && matchTipo && matchPesquisa;
     });
@@ -329,6 +361,10 @@ export class RotaListComponent implements OnInit {
       destino: true,
       responsavel: true,
       tipo: true,
+      nota: true,
+      cliente: true,
+      veiculo: true,
+      ajudantes: true,
       acoes: true
     };
   }
@@ -387,6 +423,11 @@ export class RotaListComponent implements OnInit {
     const horas = Math.floor(minutos / 60);
     const mins = minutos % 60;
     return horas > 0 ? `${horas}h ${mins}min` : `${mins} min`;
+  }
+
+  ajudantesTexto(rota: Rota): string {
+    const nomes = rota.ajudantes?.map(ajudante => ajudante.nomeAjuda).filter(Boolean) || [];
+    return nomes.length ? nomes.join(', ') : '-';
   }
 
   editar(id: number): void {

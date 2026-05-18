@@ -105,15 +105,33 @@ CREATE TABLE IF NOT EXISTS tbtransporte (
 -- Tabela de Rotas (nova tabela para o módulo de rotas)
 CREATE TABLE IF NOT EXISTS tbrota (
     idRota SERIAL PRIMARY KEY,
-    nomeRota VARCHAR(200) NOT NULL,
     origem VARCHAR(200) NOT NULL,
     destino VARCHAR(200) NOT NULL,
+    tipo_responsavel VARCHAR(20) NOT NULL,
+    id_responsavel BIGINT NOT NULL,
+    nome_responsavel VARCHAR(200),
+    id_nota BIGINT,
+    numero_nota INTEGER,
+    cliente_nota VARCHAR(100),
+    id_cliente BIGINT,
+    nome_cliente VARCHAR(200),
+    id_veiculo BIGINT,
+    nome_veiculo VARCHAR(200),
+    placa_veiculo VARCHAR(20),
     distanciaKm DECIMAL(10, 2),
     tempoEstimadoHoras DECIMAL(5, 2),
     pedagios DECIMAL(10, 2),
     observacoes TEXT,
     criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tbrota_ajudantes (
+    id_rota BIGINT NOT NULL,
+    id_ajudante BIGINT NOT NULL,
+    PRIMARY KEY (id_rota, id_ajudante),
+    CONSTRAINT fk_tbrota_ajudantes_rota FOREIGN KEY (id_rota) REFERENCES tbrota (idRota) ON DELETE CASCADE,
+    CONSTRAINT fk_tbrota_ajudantes_ajudante FOREIGN KEY (id_ajudante) REFERENCES tbajudante (idAjuda) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tbnota_ajudantes (

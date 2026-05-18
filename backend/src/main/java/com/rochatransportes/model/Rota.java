@@ -1,14 +1,20 @@
 package com.rochatransportes.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -46,6 +52,39 @@ public class Rota {
     @Size(max = 200)
     @Column(name = "nome_responsavel", length = 200)
     private String nomeResponsavel;
+
+    @Column(name = "id_nota")
+    private Long idNota;
+
+    @Column(name = "numero_nota")
+    private Integer numeroNota;
+
+    @Size(max = 100)
+    @Column(name = "cliente_nota", length = 100)
+    private String clienteNota;
+
+    @Column(name = "id_cliente")
+    private Long idCliente;
+
+    @Column(name = "nome_cliente", length = 200)
+    private String nomeCliente;
+
+    @Column(name = "id_veiculo")
+    private Long idVeiculo;
+
+    @Column(name = "nome_veiculo", length = 200)
+    private String nomeVeiculo;
+
+    @Column(name = "placa_veiculo", length = 20)
+    private String placaVeiculo;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "tbrota_ajudantes",
+        joinColumns = @JoinColumn(name = "id_rota"),
+        inverseJoinColumns = @JoinColumn(name = "id_ajudante")
+    )
+    private List<Ajudante> ajudantes = new ArrayList<>();
 
     @Column(name = "distanciaKm")
     private Double distanciaKm;
@@ -124,6 +163,78 @@ public class Rota {
 
     public void setNomeResponsavel(String nomeResponsavel) {
         this.nomeResponsavel = nomeResponsavel;
+    }
+
+    public Long getIdNota() {
+        return idNota;
+    }
+
+    public void setIdNota(Long idNota) {
+        this.idNota = idNota;
+    }
+
+    public Integer getNumeroNota() {
+        return numeroNota;
+    }
+
+    public void setNumeroNota(Integer numeroNota) {
+        this.numeroNota = numeroNota;
+    }
+
+    public String getClienteNota() {
+        return clienteNota;
+    }
+
+    public void setClienteNota(String clienteNota) {
+        this.clienteNota = clienteNota;
+    }
+
+    public Long getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Long idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public Long getIdVeiculo() {
+        return idVeiculo;
+    }
+
+    public void setIdVeiculo(Long idVeiculo) {
+        this.idVeiculo = idVeiculo;
+    }
+
+    public String getNomeVeiculo() {
+        return nomeVeiculo;
+    }
+
+    public void setNomeVeiculo(String nomeVeiculo) {
+        this.nomeVeiculo = nomeVeiculo;
+    }
+
+    public String getPlacaVeiculo() {
+        return placaVeiculo;
+    }
+
+    public void setPlacaVeiculo(String placaVeiculo) {
+        this.placaVeiculo = placaVeiculo;
+    }
+
+    public List<Ajudante> getAjudantes() {
+        return ajudantes;
+    }
+
+    public void setAjudantes(List<Ajudante> ajudantes) {
+        this.ajudantes = ajudantes;
     }
 
     public Double getDistanciaKm() {

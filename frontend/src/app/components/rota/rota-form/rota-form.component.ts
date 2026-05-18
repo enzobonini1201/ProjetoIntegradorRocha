@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { NotaService } from '../../../services/nota.service';
+import { RotaService } from '../../../services/rota.service';
 import { MotoristaService } from '../../../services/motorista.service';
 import { AgregadoService } from '../../../services/agregado.service';
 import { ClienteService } from '../../../services/cliente.service';
@@ -14,6 +15,7 @@ import { Cliente } from '../../../models/cliente.model';
 import { Transporte } from '../../../models/transporte.model';
 import { Ajudante } from '../../../models/ajudante.model';
 import { Nota } from '../../../models/nota.model';
+import { Rota } from '../../../models/rota.model';
 
 @Component({
   selector: 'app-rota-form',
@@ -33,6 +35,49 @@ import { Nota } from '../../../models/nota.model';
             <div class="card card-custom">
               <div class="card-body">
                 <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                  <div class="row">
+                    <div class="col-12">
+                      <hr class="my-4">
+                      <h5 class="mb-3"><i class="bi bi-signpost-split"></i> Controle da Rota</h5>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label"><i class="bi bi-geo-alt"></i> Origem *</label>
+                      <input type="text" class="form-control" formControlName="origem" [class.is-invalid]="submitted && form.get('origem')?.errors" placeholder="Ex: São Paulo, SP">
+                      <div class="invalid-feedback" *ngIf="submitted && form.get('origem')?.errors">Origem é obrigatória</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label"><i class="bi bi-geo-alt-fill"></i> Destino *</label>
+                      <input type="text" class="form-control" formControlName="destino" [class.is-invalid]="submitted && form.get('destino')?.errors" placeholder="Ex: Rio de Janeiro, RJ">
+                      <div class="invalid-feedback" *ngIf="submitted && form.get('destino')?.errors">Destino é obrigatório</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label d-block">Tipo de Responsável *</label>
+                      <div class="d-flex gap-3 flex-wrap">
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" formControlName="tipoResponsavel" value="motorista" id="rotaTipoMotorista" (change)="onTipoResponsavelChange()">
+                          <label class="form-check-label" for="rotaTipoMotorista"><i class="bi bi-truck"></i> Motorista</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" formControlName="tipoResponsavel" value="agregado" id="rotaTipoAgregado" (change)="onTipoResponsavelChange()">
+                          <label class="form-check-label" for="rotaTipoAgregado"><i class="bi bi-person-badge"></i> Agregado</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Responsável *</label>
+                      <div class="input-group">
+                        <select class="form-select" formControlName="idResponsavel" (change)="onResponsavelRotaChange()" [class.is-invalid]="submitted && form.get('idResponsavel')?.errors">
+                          <option value="">Selecione...</option>
+                          <option *ngFor="let resp of listaResponsaveisRota" [value]="resp.id">{{ resp.nome }}</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-primary" (click)="abrirCadastro(form.get('tipoResponsavel')?.value === 'agregado' ? '/agregados/novo' : '/motoristas/novo')">
+                          <i class="bi bi-plus-circle"></i> Adicionar novo
+                        </button>
+                      </div>
+                      <div class="invalid-feedback d-block" *ngIf="submitted && form.get('idResponsavel')?.errors">Selecione um responsável</div>
+                    </div>
+                  </div>
+
                   <div class="row">
                     <div class="col-md-4 mb-3">
                       <label class="form-label"><i class="bi bi-hash"></i> Número *</label>
@@ -183,25 +228,25 @@ import { Nota } from '../../../models/nota.model';
                       <input type="text" class="form-control" formControlName="nomeVeiculo" readonly>
                     </div>
 
-                    <div class="col-md-8 mb-3">
-                      <label class="form-label">Ajudantes</label>
-                      <div class="input-group">
-                        <select class="form-select" formControlName="ajudantesSelecionados" multiple size="5" (change)="onAjudantesChange()">
-                          <option *ngFor="let ajudante of ajudantes" [value]="ajudante.idAjuda">
-                            {{ ajudante.nomeAjuda }}
-                          </option>
-                        </select>
+                    <div class="col-12 mb-3">
+                      <label class="form-label d-block">Ajudantes</label>
+                      <div class="input-group mb-2">
                         <button type="button" class="btn btn-outline-primary" (click)="abrirCadastro('/ajudantes/novo')">
                           <i class="bi bi-plus-circle"></i> Adicionar novo
                         </button>
                       </div>
-                      <small class="form-text text-muted">Segure Ctrl para selecionar mais de um ajudante.</small>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label">Selecionados</label>
-                      <div class="form-control" style="min-height: 120px; overflow-y: auto;">
+                      <div class="row g-2 border rounded p-3" style="max-height: 220px; overflow-y: auto;">
+                        <div class="col-md-4" *ngFor="let ajudante of ajudantes">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" [id]="'ajudante_' + ajudante.idAjuda" [checked]="ajudantesSelecionadosIds.includes(ajudante.idAjuda!)" (change)="toggleAjudante(ajudante.idAjuda!, $event)">
+                            <label class="form-check-label" [for]="'ajudante_' + ajudante.idAjuda">{{ ajudante.nomeAjuda }}</label>
+                          </div>
+                        </div>
+                      </div>
+                      <small class="form-text text-muted d-block mt-2">Marque quantos ajudantes quiser.</small>
+                      <div class="mt-2">
                         <span *ngIf="ajudantesSelecionadosTexto.length === 0" class="text-muted">Nenhum ajudante selecionado</span>
-                        <div *ngFor="let nome of ajudantesSelecionadosTexto" class="badge bg-secondary me-1 mb-1">{{ nome }}</div>
+                        <span *ngFor="let nome of ajudantesSelecionadosTexto" class="badge bg-secondary me-1 mb-1">{{ nome }}</span>
                       </div>
                     </div>
                   </div>
@@ -241,7 +286,7 @@ import { Nota } from '../../../models/nota.model';
                     <button type="submit" class="btn btn-primary" [disabled]="loading">
                       <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
                       <i class="bi bi-check-circle" *ngIf="!loading"></i>
-                      {{ loading ? 'Salvando...' : 'Salvar em Notas' }}
+                      {{ loading ? 'Salvando...' : 'Salvar' }}
                     </button>
                   </div>
                 </form>
@@ -262,16 +307,21 @@ export class RotaFormComponent implements OnInit {
 
   listaColetadores: Array<{ id: number; nome: string }> = [];
   listaEntregadores: Array<{ id: number; nome: string }> = [];
+  listaResponsaveisRota: Array<{ id: number; nome: string }> = [];
   clientes: Cliente[] = [];
   transportes: Transporte[] = [];
   ajudantes: Ajudante[] = [];
   motoristas: Motorista[] = [];
   agregados: Agregado[] = [];
   ajudantesSelecionadosTexto: string[] = [];
+  ajudantesSelecionadosIds: number[] = [];
+  rotaEditandoId?: number;
+  notaEditandoId?: number;
 
   constructor(
     private fb: FormBuilder,
     private service: NotaService,
+    private rotaService: RotaService,
     private motoristaService: MotoristaService,
     private agregadoService: AgregadoService,
     private clienteService: ClienteService,
@@ -283,6 +333,15 @@ export class RotaFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
+      origem: ['', Validators.required],
+      destino: ['', Validators.required],
+      tipoResponsavel: ['motorista', Validators.required],
+      idResponsavel: ['', Validators.required],
+      nomeResponsavel: [''],
+      distanciaKm: [''],
+      tempoEstimadoMinutos: [''],
+      coordenadasOrigem: [''],
+      coordenadasDestino: [''],
       numeroNota: ['', Validators.required],
       qtdNota: ['', Validators.required],
       razaosocialdestNota: ['', Validators.required],
@@ -304,7 +363,6 @@ export class RotaFormComponent implements OnInit {
       idVeiculo: ['', Validators.required],
       nomeVeiculo: [''],
       placaVeiculo: [''],
-      ajudantesSelecionados: [[]]
     });
 
     this.form.get('cnpjdestNota')?.valueChanges.subscribe(value => {
@@ -328,7 +386,7 @@ export class RotaFormComponent implements OnInit {
 
     if (this.id) {
       this.isEdit = true;
-      carregamentos['nota'] = this.service.buscarPorId(this.id);
+      carregamentos['rota'] = this.rotaService.buscarPorId(this.id);
     }
 
     forkJoin(carregamentos).subscribe({
@@ -339,12 +397,22 @@ export class RotaFormComponent implements OnInit {
         this.transportes = result.transportes || [];
         this.ajudantes = result.ajudantes || [];
 
-        if (result.nota) {
-          this.preencherFormulario(result.nota as Nota);
+        if (result.rota) {
+          this.rotaEditandoId = result.rota.idRota;
+          this.notaEditandoId = result.rota.idNota;
+          this.preencherFormulario(result.rota as Rota);
+          this.onTipoResponsavelChange(true);
+          if (result.rota.idNota) {
+            this.service.buscarPorId(result.rota.idNota).subscribe({
+              next: nota => this.preencherNotaFormulario(nota),
+              error: () => undefined
+            });
+          }
         }
 
         this.onTipoColetadorChange(true);
         this.onTipoEntregadorChange(true);
+        this.onTipoResponsavelChange(true);
       },
       error: () => {
         alert('Erro ao carregar os dados iniciais do formulário.');
@@ -352,16 +420,48 @@ export class RotaFormComponent implements OnInit {
     });
   }
 
-  preencherFormulario(nota: Nota): void {
-    const ajudantesSelecionados = (nota.ajudantes || [])
+  preencherFormulario(rota: Rota): void {
+    const ajudantesSelecionados = (rota.ajudantes || [])
       .map((ajudante: any) => ajudante.idAjuda ?? ajudante.id)
       .filter((id: number | undefined) => id != null);
 
     this.form.patchValue({
-      ...nota,
+      ...rota,
       ajudantesSelecionados
     });
 
+    this.ajudantesSelecionadosIds = ajudantesSelecionados as number[];
+    this.ajudantesSelecionadosTexto = (rota.ajudantes || [])
+      .map((ajudante: any) => ajudante.nomeAjuda ?? ajudante.nome ?? '')
+      .filter((nome: string) => !!nome);
+  }
+
+  preencherNotaFormulario(nota: Nota): void {
+    this.form.patchValue({
+      numeroNota: nota.numeroNota,
+      qtdNota: nota.qtdNota,
+      razaosocialdestNota: nota.razaosocialdestNota,
+      cidadedestNota: nota.cidadedestNota,
+      cnpjdestNota: nota.cnpjdestNota,
+      datacoletaNota: nota.datacoletaNota,
+      dataentregaNota: nota.dataentregaNota,
+      clienteNota: nota.clienteNota,
+      idCliente: nota.idCliente,
+      nomeCliente: nota.nomeCliente,
+      tipoColetador: nota.tipoColetador || 'motorista',
+      idColetador: nota.idColetador,
+      nomeColetador: nota.nomeColetador,
+      tipoEntregador: nota.tipoEntregador,
+      idEntregador: nota.idEntregador,
+      nomeEntregador: nota.nomeEntregador,
+      idVeiculo: nota.idVeiculo,
+      nomeVeiculo: nota.nomeVeiculo,
+      placaVeiculo: nota.placaVeiculo
+    });
+
+    this.ajudantesSelecionadosIds = (nota.ajudantes || [])
+      .map((ajudante: any) => ajudante.idAjuda ?? ajudante.id)
+      .filter((id: number | undefined) => id != null) as number[];
     this.ajudantesSelecionadosTexto = (nota.ajudantes || [])
       .map((ajudante: any) => ajudante.nomeAjuda ?? ajudante.nome ?? '')
       .filter((nome: string) => !!nome);
@@ -379,6 +479,22 @@ export class RotaFormComponent implements OnInit {
     this.listaColetadores = this.getResponsaveis(tipo);
     if (!manterSelecao) {
       this.form.patchValue({ idColetador: '', nomeColetador: '', coletadoporNota: '' });
+    }
+  }
+
+  onTipoResponsavelChange(manterSelecao = false): void {
+    const tipo = this.form.get('tipoResponsavel')?.value;
+    this.listaResponsaveisRota = this.getResponsaveis(tipo);
+    if (!manterSelecao) {
+      this.form.patchValue({ idResponsavel: '', nomeResponsavel: '' });
+    }
+  }
+
+  onResponsavelRotaChange(): void {
+    const id = this.form.get('idResponsavel')?.value;
+    const responsavel = this.listaResponsaveisRota.find(r => r.id == id);
+    if (responsavel) {
+      this.form.patchValue({ nomeResponsavel: responsavel.nome });
     }
   }
 
@@ -435,11 +551,18 @@ export class RotaFormComponent implements OnInit {
     }
   }
 
-  onAjudantesChange(): void {
-    const selecionados = this.form.get('ajudantesSelecionados')?.value || [];
-    const ids = Array.isArray(selecionados) ? selecionados.map((valor: string | number) => Number(valor)) : [];
-    this.ajudantesSelecionadosTexto = ids
-      .map(id => this.ajudantes.find(ajudante => ajudante.idAjuda == id))
+  toggleAjudante(id: number, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      if (!this.ajudantesSelecionadosIds.includes(id)) {
+        this.ajudantesSelecionadosIds = [...this.ajudantesSelecionadosIds, id];
+      }
+    } else {
+      this.ajudantesSelecionadosIds = this.ajudantesSelecionadosIds.filter(item => item !== id);
+    }
+
+    this.ajudantesSelecionadosTexto = this.ajudantesSelecionadosIds
+      .map(ajudanteId => this.ajudantes.find(ajudante => ajudante.idAjuda == ajudanteId))
       .filter((ajudante): ajudante is Ajudante => !!ajudante)
       .map(ajudante => ajudante.nomeAjuda);
   }
@@ -464,25 +587,73 @@ export class RotaFormComponent implements OnInit {
 
     this.loading = true;
 
-    const valorAjudantes = this.form.get('ajudantesSelecionados')?.value || [];
-    const ajudantesSelecionados = Array.isArray(valorAjudantes)
-      ? valorAjudantes.map((valor: string | number) => Number(valor))
-      : [];
-
-    const { ajudantesSelecionados: ignorar, ...resto } = this.form.value;
-    const payload: any = {
-      ...resto,
-      ajudantes: ajudantesSelecionados.map((id: number) => ({ idAjuda: id }))
+    const ajudantesSelecionados = this.ajudantesSelecionadosIds.map(id => ({ idAjuda: id }));
+    const notaPayload: any = {
+      numeroNota: this.form.value.numeroNota,
+      qtdNota: this.form.value.qtdNota,
+      razaosocialdestNota: this.form.value.razaosocialdestNota,
+      cidadedestNota: this.form.value.cidadedestNota,
+      cnpjdestNota: this.form.value.cnpjdestNota,
+      datacoletaNota: this.form.value.datacoletaNota,
+      dataentregaNota: this.form.value.dataentregaNota,
+      clienteNota: this.form.value.clienteNota,
+      idCliente: this.form.value.idCliente,
+      nomeCliente: this.form.value.nomeCliente,
+      tipoColetador: this.form.value.tipoColetador,
+      idColetador: this.form.value.idColetador,
+      nomeColetador: this.form.value.nomeColetador,
+      tipoEntregador: this.form.value.tipoEntregador,
+      idEntregador: this.form.value.idEntregador,
+      nomeEntregador: this.form.value.nomeEntregador,
+      idVeiculo: this.form.value.idVeiculo,
+      nomeVeiculo: this.form.value.nomeVeiculo,
+      placaVeiculo: this.form.value.placaVeiculo,
+      ajudantes: ajudantesSelecionados
     };
 
-    const operacao = this.isEdit
-      ? this.service.atualizar(this.id!, payload)
-      : this.service.criar(payload);
+    const salvarNota = this.isEdit && this.notaEditandoId
+      ? this.service.atualizar(this.notaEditandoId, notaPayload)
+      : this.service.criar(notaPayload);
 
-    operacao.subscribe({
-      next: () => {
-        alert('Nota salva com sucesso!');
-        this.router.navigate(['/notas']);
+    salvarNota.subscribe({
+      next: (notaSalva: any) => {
+        const notaId = notaSalva?.idNota || this.notaEditandoId;
+        const rotaPayload: any = {
+          origem: this.form.value.origem,
+          destino: this.form.value.destino,
+          tipoResponsavel: this.form.value.tipoResponsavel,
+          idResponsavel: this.form.value.idResponsavel,
+          nomeResponsavel: this.form.value.nomeResponsavel,
+          distanciaKm: this.form.value.distanciaKm,
+          tempoEstimadoMinutos: this.form.value.tempoEstimadoMinutos,
+          coordenadasOrigem: this.form.value.coordenadasOrigem,
+          coordenadasDestino: this.form.value.coordenadasDestino,
+          idNota: notaId,
+          numeroNota: this.form.value.numeroNota,
+          clienteNota: this.form.value.clienteNota,
+          idCliente: this.form.value.idCliente,
+          nomeCliente: this.form.value.nomeCliente,
+          idVeiculo: this.form.value.idVeiculo,
+          nomeVeiculo: this.form.value.nomeVeiculo,
+          placaVeiculo: this.form.value.placaVeiculo,
+          ajudantes: ajudantesSelecionados
+        };
+
+        const salvarRota = this.isEdit && this.rotaEditandoId
+          ? this.rotaService.atualizar(this.rotaEditandoId, rotaPayload)
+          : this.rotaService.criar(rotaPayload);
+
+        salvarRota.subscribe({
+          next: () => {
+            alert('Rota e nota salvas com sucesso!');
+            this.router.navigate(['/rotas']);
+          },
+          error: (error) => {
+            console.error('Erro ao salvar rota:', error);
+            alert(error.error?.message || 'Erro ao salvar rota');
+            this.loading = false;
+          }
+        });
       },
       error: (error) => {
         console.error('Erro ao salvar nota:', error);
