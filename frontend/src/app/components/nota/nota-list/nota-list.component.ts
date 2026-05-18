@@ -91,6 +91,14 @@ import { Nota } from '../../../models/nota.model';
                   <label class="form-check-label small" for="colCliNota">Cliente</label>
                 </div>
                 <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.veiculo" id="colVeicNota">
+                  <label class="form-check-label small" for="colVeicNota">Veículo</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.ajudantes" id="colAjudaNota">
+                  <label class="form-check-label small" for="colAjudaNota">Ajudantes</label>
+                </div>
+                <div class="form-check form-check-inline">
                   <input class="form-check-input" type="checkbox" [(ngModel)]="colunas.razao" id="colRazNota">
                   <label class="form-check-label small" for="colRazNota">Razão Social</label>
                 </div>
@@ -129,6 +137,8 @@ import { Nota } from '../../../models/nota.model';
                 <th class="azul" *ngIf="colunas.numero">Número</th>
                 <th class="azul" *ngIf="colunas.quantidade">Qtd</th>
                 <th class="azul" *ngIf="colunas.cliente">Cliente</th>
+                <th class="azul" *ngIf="colunas.veiculo">Veículo</th>
+                <th class="azul" *ngIf="colunas.ajudantes">Ajudantes</th>
                 <th class="azul" *ngIf="colunas.razao">Razão Social Dest.</th>
                 <th class="azul" *ngIf="colunas.cidade">Cidade Dest.</th>
                 <th class="azul" *ngIf="colunas.dataColeta">Data Coleta</th>
@@ -143,6 +153,8 @@ import { Nota } from '../../../models/nota.model';
                 <td *ngIf="colunas.numero">{{ item.numeroNota }}</td>
                 <td *ngIf="colunas.quantidade">{{ item.qtdNota }}</td>
                 <td *ngIf="colunas.cliente">{{ item.clienteNota }}</td>
+                <td *ngIf="colunas.veiculo">{{ item.nomeVeiculo || item.placaVeiculo || '-' }}</td>
+                <td *ngIf="colunas.ajudantes">{{ ajudantesTexto(item) }}</td>
                 <td *ngIf="colunas.razao">{{ item.razaosocialdestNota }}</td>
                 <td *ngIf="colunas.cidade">{{ item.cidadedestNota }}</td>
                 <td *ngIf="colunas.dataColeta">{{ item.datacoletaNota | date: 'dd/MM/yyyy' }}</td>
@@ -188,6 +200,8 @@ export class NotaListComponent implements OnInit {
     numero: true,
     quantidade: true,
     cliente: true,
+    veiculo: true,
+    ajudantes: true,
     razao: true,
     cidade: true,
     dataColeta: true,
@@ -219,6 +233,7 @@ export class NotaListComponent implements OnInit {
         nota.numeroNota?.toString().includes(this.filtroNumero);
       const matchCliente = !this.filtroCliente || 
         nota.clienteNota?.toLowerCase().includes(this.filtroCliente.toLowerCase());
+      const matchVeiculo = true;
       const matchRazao = !this.filtroRazao || 
         nota.razaosocialdestNota?.toLowerCase().includes(this.filtroRazao.toLowerCase());
       const matchCidade = !this.filtroCidade || 
@@ -229,10 +244,11 @@ export class NotaListComponent implements OnInit {
       const matchPesquisa = !this.pesquisa || 
         nota.numeroNota?.toString().includes(this.pesquisa.toLowerCase()) ||
         nota.clienteNota?.toLowerCase().includes(this.pesquisa.toLowerCase()) ||
+        (nota.nomeVeiculo || '').toLowerCase().includes(this.pesquisa.toLowerCase()) ||
         nota.razaosocialdestNota?.toLowerCase().includes(this.pesquisa.toLowerCase()) ||
         nota.cidadedestNota?.toLowerCase().includes(this.pesquisa.toLowerCase());
       
-      return matchNumero && matchCliente && matchRazao && matchCidade && matchStatus && matchPesquisa;
+      return matchNumero && matchCliente && matchVeiculo && matchRazao && matchCidade && matchStatus && matchPesquisa;
     });
   }
 
@@ -248,6 +264,11 @@ export class NotaListComponent implements OnInit {
 
   contarColunas(): number {
     return Object.values(this.colunas).filter(v => v).length;
+  }
+
+  ajudantesTexto(item: Nota): string {
+    const nomes = item.ajudantes?.map(ajudante => ajudante.nomeAjuda).filter(Boolean) || [];
+    return nomes.length ? nomes.join(', ') : '-';
   }
 
   deletar(id: number, numero: number): void {

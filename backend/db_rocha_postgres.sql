@@ -81,6 +81,11 @@ CREATE TABLE IF NOT EXISTS tbnotas (
     datacoletaNota DATE NOT NULL,
     dataentregaNota DATE NOT NULL,
     clienteNota VARCHAR(100) NOT NULL,
+    idCliente BIGINT,
+    nomeCliente VARCHAR(200),
+    idVeiculo BIGINT,
+    nomeVeiculo VARCHAR(200),
+    placaVeiculo VARCHAR(20),
     criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -109,6 +114,14 @@ CREATE TABLE IF NOT EXISTS tbrota (
     observacoes TEXT,
     criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tbnota_ajudantes (
+    id_nota BIGINT NOT NULL,
+    id_ajudante BIGINT NOT NULL,
+    PRIMARY KEY (id_nota, id_ajudante),
+    CONSTRAINT fk_tbnota_ajudantes_nota FOREIGN KEY (id_nota) REFERENCES tbnotas (idNota) ON DELETE CASCADE,
+    CONSTRAINT fk_tbnota_ajudantes_ajudante FOREIGN KEY (id_ajudante) REFERENCES tbajudante (idAjuda) ON DELETE CASCADE
 );
 
 -- Inserir usuário padrão (senha: 123456 - hash SHA-256)

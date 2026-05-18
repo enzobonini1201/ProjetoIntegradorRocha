@@ -10,6 +10,12 @@ export interface Nota {
   datacoletaNota: string;
   dataentregaNota?: string | null;
   clienteNota: string;
+  idCliente?: number;
+  nomeCliente?: string;
+  idVeiculo?: number;
+  nomeVeiculo?: string;
+  placaVeiculo?: string;
+  ajudantes?: Array<{ idAjuda?: number; nomeAjuda?: string }>;
   diasRestantes?: number;
   status?: string;
   // Novos campos para coletador

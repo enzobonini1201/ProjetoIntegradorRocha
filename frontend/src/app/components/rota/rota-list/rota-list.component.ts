@@ -28,7 +28,7 @@ import { Rota } from '../../../models/rota.model';
             <button class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados">
               <i class="bi bi-funnel"></i> Filtros
             </button>
-            <button class="btn btn-primary" (click)="router.navigate(['/rotas/novo'])"><i class="bi bi-plus-circle"></i> Nova Rota</button>
+            <button class="btn btn-primary" (click)="router.navigate(['/rotas/novo'])"><i class="bi bi-plus-circle"></i> Nova Nota</button>
           </div>
         </div>
 

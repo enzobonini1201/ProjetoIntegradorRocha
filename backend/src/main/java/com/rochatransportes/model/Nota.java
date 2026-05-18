@@ -1,14 +1,20 @@
 package com.rochatransportes.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -77,6 +83,35 @@ public class Nota {
     @Column(name = "clienteNota", nullable = false)
     @JsonProperty("clienteNota")
     private String cliente;
+
+    @Column(name = "idCliente")
+    @JsonProperty("idCliente")
+    private Long idCliente;
+
+    @Column(name = "nomeCliente", length = 200)
+    @JsonProperty("nomeCliente")
+    private String nomeCliente;
+
+    @Column(name = "idVeiculo")
+    @JsonProperty("idVeiculo")
+    private Long idVeiculo;
+
+    @Column(name = "nomeVeiculo", length = 200)
+    @JsonProperty("nomeVeiculo")
+    private String nomeVeiculo;
+
+    @Column(name = "placaVeiculo", length = 20)
+    @JsonProperty("placaVeiculo")
+    private String placaVeiculo;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "tbnota_ajudantes",
+        joinColumns = @JoinColumn(name = "id_nota"),
+        inverseJoinColumns = @JoinColumn(name = "id_ajudante")
+    )
+    @JsonProperty("ajudantes")
+    private List<Ajudante> ajudantes = new ArrayList<>();
 
     // Novos campos para coletador (motorista/agregado)
     @Column(name = "tipo_coletador", length = 20)
@@ -191,6 +226,54 @@ public class Nota {
 
     public void setCliente(String cliente) {
         this.cliente = cliente;
+    }
+
+    public Long getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Long idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public Long getIdVeiculo() {
+        return idVeiculo;
+    }
+
+    public void setIdVeiculo(Long idVeiculo) {
+        this.idVeiculo = idVeiculo;
+    }
+
+    public String getNomeVeiculo() {
+        return nomeVeiculo;
+    }
+
+    public void setNomeVeiculo(String nomeVeiculo) {
+        this.nomeVeiculo = nomeVeiculo;
+    }
+
+    public String getPlacaVeiculo() {
+        return placaVeiculo;
+    }
+
+    public void setPlacaVeiculo(String placaVeiculo) {
+        this.placaVeiculo = placaVeiculo;
+    }
+
+    public List<Ajudante> getAjudantes() {
+        return ajudantes;
+    }
+
+    public void setAjudantes(List<Ajudante> ajudantes) {
+        this.ajudantes = ajudantes;
     }
 
     // Getters e Setters para coletador
