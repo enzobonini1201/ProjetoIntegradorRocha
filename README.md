@@ -20,7 +20,8 @@ Instale antes de executar:
 >
 > `C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot`
 >
-> Se seu Java estiver em outro caminho, altere a variável `$javaPath` dentro desse script.
+> Se seu Java estiver em outro caminho, defina `JAVA_HOME` ou deixe o `java` disponível no `PATH`.
+> O script foi ajustado para usar o Maven Wrapper do próprio repositório, então não depende de Maven global.
 
 ## 3) Configuração do banco de dados
 
@@ -70,6 +71,11 @@ Se preferir sem script:
 cd "c:\Users\lgtgu\OneDrive\Área de Trabalho\SistemaRocha\backend"
 .\mvnw.cmd spring-boot:run
 ```
+
+Requisito do backend:
+
+- JDK 17+ instalado
+- `JAVA_HOME` configurado, ou `java`/`javac` disponíveis no `PATH`
 
 Backend disponível em:
 

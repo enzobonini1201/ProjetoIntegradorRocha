@@ -1,87 +1,52 @@
-# Script para instalar Maven e rodar o backend
-# Execute: .\start-backend.ps1
-
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host "SISTEMA ROCHA - INICIANDO BACKEND" -ForegroundColor Cyan
 Write-Host "====================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Configurar JAVA_HOME
-$javaPath = "C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
-if (Test-Path $javaPath) {
-    $env:JAVA_HOME = $javaPath
-    Write-Host "OK JAVA_HOME configurado: $javaPath" -ForegroundColor Green
-} else {
-    Write-Host "ERRO Java nao encontrado em $javaPath" -ForegroundColor Red
-    Write-Host "Por favor instale o Java 17+ ou ajuste o caminho" -ForegroundColor Yellow
+function Resolve-JavaHome {
+    if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME 'bin\java.exe'))) {
+        return $env:JAVA_HOME
+    }
+
+    $javaCommand = Get-Command java -ErrorAction SilentlyContinue
+    if ($null -ne $javaCommand) {
+        return Split-Path -Parent (Split-Path -Parent $javaCommand.Source)
+    }
+
+    return $null
+}
+
+$resolvedJavaHome = Resolve-JavaHome
+if ($null -eq $resolvedJavaHome) {
+    Write-Host "ERRO Java nao encontrado" -ForegroundColor Red
+    Write-Host "Instale o JDK 17+ ou defina JAVA_HOME antes de rodar este script." -ForegroundColor Yellow
     exit 1
 }
 
-# Verificar se Maven esta instalado
-$mavenInstalled = $false
-try {
-    $null = & mvn --version 2>&1
-    $mavenInstalled = $true
-    Write-Host "OK Maven encontrado no sistema" -ForegroundColor Green
-} catch {
-    Write-Host "Maven nao encontrado" -ForegroundColor Yellow
-}
+$env:JAVA_HOME = $resolvedJavaHome
+$env:PATH = "$(Join-Path $env:JAVA_HOME 'bin');$env:PATH"
+Write-Host "OK JAVA_HOME configurado: $env:JAVA_HOME" -ForegroundColor Green
 
-# Se Maven nao estiver instalado baixar e usar versao portatil
-if (-not $mavenInstalled) {
-    $mavenDir = "$PSScriptRoot\maven-portable"
-    $mavenBin = "$mavenDir\apache-maven-3.9.6\bin\mvn.cmd"
-    
-    if (Test-Path $mavenBin) {
-        Write-Host "OK Usando Maven portatil" -ForegroundColor Green
-        $env:PATH = "$mavenDir\apache-maven-3.9.6\bin;$env:PATH"
-    } else {
-        Write-Host "Baixando Maven portatil..." -ForegroundColor Yellow
-        
-        # Criar diretorio
-        New-Item -ItemType Directory -Force -Path $mavenDir | Out-Null
-        
-        # Baixar Maven
-        $mavenZip = "$mavenDir\maven.zip"
-        $mavenUrl = "https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.zip"
-        
-        Write-Host "Baixando de: $mavenUrl" -ForegroundColor Gray
-        try {
-            Invoke-WebRequest -Uri $mavenUrl -OutFile $mavenZip -UseBasicParsing
-            Write-Host "OK Download concluido" -ForegroundColor Green
-            
-            # Extrair
-            Write-Host "Extraindo..." -ForegroundColor Gray
-            Expand-Archive -Path $mavenZip -DestinationPath $mavenDir -Force
-            Remove-Item $mavenZip
-            
-            $env:PATH = "$mavenDir\apache-maven-3.9.6\bin;$env:PATH"
-            Write-Host "OK Maven portatil instalado" -ForegroundColor Green
-        } catch {
-            Write-Host "ERRO ao baixar Maven: $_" -ForegroundColor Red
-            Write-Host ""
-            Write-Host "SOLUCAO ALTERNATIVA:" -ForegroundColor Yellow
-            Write-Host "1. Baixe Maven manualmente: https://maven.apache.org/download.cgi" -ForegroundColor White
-            Write-Host "2. Extraia para C:\Program Files\Apache\Maven" -ForegroundColor White
-            Write-Host "3. Adicione ao PATH: C:\Program Files\Apache\Maven\bin" -ForegroundColor White
-            exit 1
-        }
-    }
+if (-not (Test-Path (Join-Path $PSScriptRoot 'mvnw.cmd'))) {
+    Write-Host "ERRO Maven Wrapper nao encontrado em $PSScriptRoot" -ForegroundColor Red
+    exit 1
 }
 
 Write-Host ""
 Write-Host "Iniciando compilacao e execucao do backend..." -ForegroundColor Yellow
 Write-Host ""
 
-# Mudar para diretorio do backend
-cd "$PSScriptRoot"
-
-# Compilar e executar
+Push-Location $PSScriptRoot
 try {
-    mvn spring-boot:run
+    & .\mvnw.cmd spring-boot:run
+    if ($LASTEXITCODE -ne 0) {
+        throw "mvnw.cmd retornou o codigo $LASTEXITCODE"
+    }
 } catch {
-    Write-Host ""
-    Write-Host "ERRO ao executar Maven" -ForegroundColor Red
-    Write-Host "Tente executar manualmente: mvn spring-boot:run" -ForegroundColor Yellow
+    Write-Host "" 
+    Write-Host "ERRO ao executar o backend" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Yellow
     exit 1
+} finally {
+    Pop-Location
 }

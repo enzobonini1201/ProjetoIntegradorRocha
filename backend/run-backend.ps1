@@ -1,41 +1,43 @@
-# Script para rodar o backend sem Maven
 $ErrorActionPreference = "Stop"
 
-Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "SISTEMA ROCHA - INICIANDO BACKEND" -ForegroundColor Cyan
-Write-Host "=====================================" -ForegroundColor Cyan
+function Resolve-JavaHome {
+    if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME 'bin\java.exe'))) {
+        return $env:JAVA_HOME
+    }
 
-# Configurar JAVA_HOME
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
-$env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+    $javaCommand = Get-Command java -ErrorAction SilentlyContinue
+    if ($null -ne $javaCommand) {
+        return Split-Path -Parent (Split-Path -Parent $javaCommand.Source)
+    }
 
-# Limpar compilações antigas
-Write-Host "`nLimpando compilações antigas..." -ForegroundColor Yellow
-Remove-Item -Path "target\classes\com\rochatransportes\*" -Recurse -Force -ErrorAction SilentlyContinue
+    return $null
+}
 
-# Compilar classes Java manualmente
-Write-Host "Compilando código-fonte..." -ForegroundColor Yellow
+$resolvedJavaHome = Resolve-JavaHome
+if ($null -eq $resolvedJavaHome) {
+    Write-Host "ERRO Java nao encontrado" -ForegroundColor Red
+    Write-Host "Instale o JDK 17+ ou defina JAVA_HOME antes de rodar este script." -ForegroundColor Yellow
+    exit 1
+}
 
-$srcPath = "src\main\java"
-$targetPath = "target\classes"
-$resourcesPath = "src\main\resources"
+$env:JAVA_HOME = $resolvedJavaHome
+$env:PATH = "$(Join-Path $env:JAVA_HOME 'bin');$env:PATH"
 
-# Criar diretório target se não existir
-New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
+if (-not (Test-Path (Join-Path $PSScriptRoot 'mvnw.cmd'))) {
+    Write-Host "ERRO Maven Wrapper nao encontrado em $PSScriptRoot" -ForegroundColor Red
+    exit 1
+}
 
-# Copiar resources
-Copy-Item -Path "$resourcesPath\*" -Destination $targetPath -Recurse -Force
+Push-Location $PSScriptRoot
+try {
+    & .\mvnw.cmd clean package -DskipTests
+    if ($LASTEXITCODE -ne 0) {
+        throw "mvnw.cmd retornou o codigo $LASTEXITCODE"
+    }
 
-# Compilar com classpath do Maven
-& "$env:JAVA_HOME\bin\java" -jar "$env:USERPROFILE\.m2\wrapper\dists\apache-maven-3.9.11\maven-mvnd-1.0-m7-windows-amd64\bin\mvnd.cmd" clean package -DskipTests
-
-if ($LASTEXITCODE -eq 0) {
     Write-Host "`nBackend compilado com sucesso!" -ForegroundColor Green
     Write-Host "Iniciando servidor..." -ForegroundColor Yellow
-    
-    # Iniciar aplicação
-    & "$env:JAVA_HOME\bin\java" -jar "target\sistema-rocha-backend-1.0.0.jar"
-} else {
-    Write-Host "`nERRO na compilação!" -ForegroundColor Red
-    exit 1
+    & .\mvnw.cmd spring-boot:run
+} finally {
+    Pop-Location
 }
