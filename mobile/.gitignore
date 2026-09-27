@@ -1,0 +1,21 @@
+.dart_tool/
+.idea/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+build/
+coverage/
+.gradle-build/
+android-sdk-local/
+.android-user-home/
+android/hs_err_*.log
+
+# Android Studio / local machine
+*.iml
+local.properties
+android/key.properties
+android/app/debug
+android/app/profile
+android/app/release
+android/app/rocha-debug.jks
