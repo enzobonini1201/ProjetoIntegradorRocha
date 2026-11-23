@@ -1,6 +1,9 @@
 package com.rochatransportes.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.Objects;
@@ -14,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.rochatransportes.dto.ResumoCidadeDTO;
 import com.rochatransportes.model.Nota;
 import com.rochatransportes.model.Ajudante;
 import com.rochatransportes.repository.AjudanteRepository;
@@ -96,6 +100,56 @@ public class NotaService {
 
     public List<Nota> findNotasPendentes() {
         return notaRepository.findByDataEntregaIsNullOrderByDataColetaAsc();
+    }
+
+    /**
+     * Agrupa as notas por cidade de destino usando um MAPA (HashMap).
+     *
+     * Chave (key)  -> nome da cidade (ex.: "CAMPINAS")
+     * Valor (value) -> ResumoCidadeDTO com os contadores daquela cidade
+     *
+     * Percorre a lista de notas UMA única vez. Para cada nota:
+     *  1. monta a chave (cidade em maiúsculas e sem espaços sobrando);
+     *  2. procura a cidade no mapa (get);
+     *  3. se ainda não existir, cria o resumo e coloca no mapa (put);
+     *  4. soma os contadores.
+     */
+    public List<ResumoCidadeDTO> resumoPorCidade() {
+        Map<String, ResumoCidadeDTO> mapa = new HashMap<>();
+
+        for (Nota nota : notaRepository.findAll()) {
+            String chave = normalizarCidade(nota.getCidadeDestino());
+
+            ResumoCidadeDTO resumo = mapa.get(chave);
+            if (resumo == null) {
+                resumo = new ResumoCidadeDTO(chave);
+                mapa.put(chave, resumo);
+            }
+
+            resumo.somarTotal();
+            if (nota.isPendente()) {
+                resumo.somarPendente();
+                if (nota.getDataColeta() != null && nota.isVencida()) {
+                    resumo.somarVencida();
+                }
+            } else {
+                resumo.somarEntregue();
+            }
+        }
+
+        // O HashMap não tem ordem; para exibir, ordena pela cidade com mais notas
+        List<ResumoCidadeDTO> resultado = new ArrayList<>(mapa.values());
+        resultado.sort(Comparator.comparingInt(ResumoCidadeDTO::getTotal).reversed()
+                .thenComparing(ResumoCidadeDTO::getCidade));
+        return resultado;
+    }
+
+    // "  Campinas " e "CAMPINAS" viram a mesma chave
+    private String normalizarCidade(String cidade) {
+        if (cidade == null || cidade.isBlank()) {
+            return "SEM CIDADE";
+        }
+        return cidade.trim().toUpperCase();
     }
 
     private void prepararAjudantes(Nota nota) {

@@ -4,6 +4,14 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Nota } from '../models/nota.model';
 
+export interface ResumoCidade {
+  cidade: string;
+  total: number;
+  pendentes: number;
+  entregues: number;
+  vencidas: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,6 +42,11 @@ export class NotaService {
 
   deletar(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  // Resumo das notas agrupadas por cidade (montado com um Mapa no backend)
+  resumoPorCidade(): Observable<ResumoCidade[]> {
+    return this.http.get<ResumoCidade[]>(`${this.apiUrl}/resumo-por-cidade`);
   }
 
   listarPendentes(): Observable<Nota[]> {

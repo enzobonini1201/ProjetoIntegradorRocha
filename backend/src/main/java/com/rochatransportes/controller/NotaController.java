@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rochatransportes.dto.ResumoCidadeDTO;
 import com.rochatransportes.model.Nota;
 import com.rochatransportes.service.NotaService;
 
@@ -38,6 +39,12 @@ public class NotaController {
     @GetMapping("/pendentes")
     public ResponseEntity<List<Nota>> getPendentes() {
         return ResponseEntity.ok(notaService.findNotasPendentes());
+    }
+
+    // Resumo das notas agrupadas por cidade de destino (usa um Mapa)
+    @GetMapping("/resumo-por-cidade")
+    public ResponseEntity<List<ResumoCidadeDTO>> getResumoPorCidade() {
+        return ResponseEntity.ok(notaService.resumoPorCidade());
     }
 
     @GetMapping("/paginated")

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NotaService } from '../../../services/nota.service';
+import { NotaService, ResumoCidade } from '../../../services/nota.service';
 import { Nota } from '../../../models/nota.model';
 
 @Component({
@@ -25,6 +25,9 @@ import { Nota } from '../../../models/nota.model';
             </form>
           </div>
           <div class="col-md-4 text-end">
+            <button class="btn btn-outline-primary me-2" (click)="alternarResumo()">
+              <i class="bi bi-geo-alt"></i> Resumo por cidade
+            </button>
             <button class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#filtrosNotas">
               <i class="bi bi-funnel"></i> Filtros
             </button>
@@ -126,6 +129,32 @@ import { Nota } from '../../../models/nota.model';
             </div>
           </div>
         </div>
+        <div class="card card-body mb-3" *ngIf="mostrarResumo">
+          <h6><i class="bi bi-geo-alt-fill"></i> Resumo de entregas por cidade de destino</h6>
+          <table class="table table-sm table-bordered mb-0">
+            <thead>
+              <tr>
+                <th>Cidade</th>
+                <th class="text-center">Total</th>
+                <th class="text-center">Pendentes</th>
+                <th class="text-center">Entregues</th>
+                <th class="text-center">Vencidas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of resumoCidades">
+                <td>{{ r.cidade }}</td>
+                <td class="text-center">{{ r.total }}</td>
+                <td class="text-center"><span class="badge bg-warning text-dark">{{ r.pendentes }}</span></td>
+                <td class="text-center"><span class="badge bg-success">{{ r.entregues }}</span></td>
+                <td class="text-center"><span class="badge" [ngClass]="r.vencidas ? 'bg-danger' : 'bg-secondary'">{{ r.vencidas }}</span></td>
+              </tr>
+              <tr *ngIf="resumoCidades.length === 0">
+                <td colspan="5" class="text-center">Nenhuma nota cadastrada</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div *ngIf="loading" class="spinner-container">
           <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Carregando...</span></div>
         </div>
@@ -185,6 +214,8 @@ import { Nota } from '../../../models/nota.model';
 export class NotaListComponent implements OnInit {
   notas: Nota[] = [];
   notasFiltradas: Nota[] = [];
+  resumoCidades: ResumoCidade[] = []; // resultado do Mapa (uma linha por cidade)
+  mostrarResumo = false;
   pesquisa: string = '';
   loading = false;
   
@@ -223,6 +254,18 @@ export class NotaListComponent implements OnInit {
     });
   }
   
+  alternarResumo(): void {
+    this.mostrarResumo = !this.mostrarResumo;
+    if (this.mostrarResumo) this.carregarResumo();
+  }
+
+  carregarResumo(): void {
+    this.service.resumoPorCidade().subscribe({
+      next: (data) => this.resumoCidades = data || [],
+      error: () => this.resumoCidades = []
+    });
+  }
+
   pesquisar(): void {
     this.aplicarFiltros();
   }
@@ -272,6 +315,9 @@ export class NotaListComponent implements OnInit {
   }
 
   deletar(id: number, numero: number): void {
-    if (confirm(`Excluir nota ${numero}?`)) this.service.deletar(id).subscribe(() => this.ngOnInit());
+    if (confirm(`Excluir nota ${numero}?`)) this.service.deletar(id).subscribe(() => {
+      this.ngOnInit();
+      if (this.mostrarResumo) this.carregarResumo();
+    });
   }
 }
